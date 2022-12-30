@@ -29,8 +29,8 @@ impl Camera {
     }
 
     pub fn get_ray(&self, dimension: Dimension, x: u32, y: u32) -> Ray {
-        let xangle = Self::compute_angle(self.fov, dimension.x, x);
-        let yangle = Self::compute_angle(self.fov, dimension.y, y);
+        let yangle = Self::compute_angle(self.fov, dimension.x, x);
+        let xangle = Self::compute_angle(self.fov, dimension.y, y);
 
         let dirvec = Vector {
             x: self.distance * f32::tan(xangle),

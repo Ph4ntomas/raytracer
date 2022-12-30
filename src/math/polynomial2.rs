@@ -1,11 +1,11 @@
 #[derive(Default, Copy, Clone, Debug)]
-pub struct Polynome2<T> {
+pub struct Polynomial2<T> {
     pub a:T,
     pub b:T,
     pub c:T,
 }
 
-impl Polynome2<f32> {
+impl Polynomial2<f32> {
     pub fn root(&self) -> Option<[f32;2]> {
         let delta = self.b * self.b - 4. * self.a * self.c;
 

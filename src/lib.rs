@@ -7,6 +7,7 @@ pub mod primitives {
     pub use vector::Vector;
     pub use quaternion::Quaternion;
 
+    #[derive(Debug)]
     pub struct Ray {
         pub orig: Point,
         pub dir: Vector
@@ -28,16 +29,53 @@ pub struct Dimension {
 }
 
 pub mod lights {
-    pub trait Light {}
+    use crate::primitives::{Point, Ray};
 
-    pub struct Point {
-        pub position: super::primitives::Point
+    #[derive(Debug)]
+    pub struct LightRay {
+        pub ray: Ray,
+        pub intensity: f32,
+        pub color: u32
+    }
+
+    pub trait Light {
+        fn get_ray(&self, point: Point) -> LightRay;
+    }
+
+    pub struct DotLight {
+        pub pos: Point,
+        pub intensity: f32,
+        pub color: u32,
+    }
+
+    impl Light for DotLight {
+        fn get_ray(&self, point: Point) -> LightRay {
+            LightRay {
+                ray: Ray {
+                    orig: self.pos,
+                    dir: point - self.pos,
+                },
+                intensity: self.intensity,
+                color: self.color
+            }
+        }
+    }
+
+    impl Default for DotLight {
+        fn default() -> Self {
+            DotLight {
+                pos: Point::zero(),
+                intensity: 1.,
+                color: 0xffffffff,
+            }
+        }
     }
 }
 
 pub mod shapes {
     use crate::primitives::{Point, Ray, Vector};
 
+    #[derive(Debug)]
     pub struct Intersection {
         pub distance: f32,
         pub position: Point,
@@ -54,11 +92,9 @@ pub mod shapes {
 
     mod sphere;
     pub use sphere::Sphere;
-
-
 }
 
 pub mod math {
-    mod polynome2;
-    pub use polynome2::Polynome2;
+    mod polynomial2;
+    pub use polynomial2::Polynomial2;
 }

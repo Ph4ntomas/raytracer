@@ -33,7 +33,8 @@ impl Image {
         self.data[index] = color.to_be_bytes()[1];
         self.data[index + 1] = color.to_be_bytes()[2];
         self.data[index + 2] = color.to_be_bytes()[3];
-        self.data[index + 3] = color.to_be_bytes()[0];
+        //self.data[index + 3] = color.to_be_bytes()[0];
+        self.data[index + 3] = 0xff;
     }
 
     pub fn get_dimension(&self) -> Dimension {
