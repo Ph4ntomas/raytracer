@@ -28,54 +28,12 @@ pub struct Dimension {
     pub y: u32
 }
 
-pub mod lights {
-    use crate::primitives::{Point, Ray};
-
-    #[derive(Debug)]
-    pub struct LightRay {
-        pub ray: Ray,
-        pub intensity: f32,
-        pub color: u32
-    }
-
-    pub trait Light {
-        fn get_ray(&self, point: Point) -> LightRay;
-    }
-
-    pub struct DotLight {
-        pub pos: Point,
-        pub intensity: f32,
-        pub color: u32,
-    }
-
-    impl Light for DotLight {
-        fn get_ray(&self, point: Point) -> LightRay {
-            LightRay {
-                ray: Ray {
-                    orig: self.pos,
-                    dir: point - self.pos,
-                },
-                intensity: self.intensity,
-                color: self.color
-            }
-        }
-    }
-
-    impl Default for DotLight {
-        fn default() -> Self {
-            DotLight {
-                pos: Point::zero(),
-                intensity: 1.,
-                color: 0xffffffff,
-            }
-        }
-    }
-}
+pub mod lights;
 
 pub mod shapes {
     use crate::primitives::{Point, Ray, Vector};
 
-    #[derive(Debug)]
+    #[derive(Debug, Clone)]
     pub struct Intersection {
         pub distance: f32,
         pub position: Point,
@@ -92,6 +50,53 @@ pub mod shapes {
 
     mod sphere;
     pub use sphere::Sphere;
+}
+
+pub mod transforms {
+    use crate::{shapes::{Intersection, Shape}, Renderer};
+
+    pub struct Transform {
+        pub surface_color: u32,
+        pub color_ratio: f32,
+        pub inter: Intersection
+    }
+
+    impl Transform {
+        pub fn init(inter: Intersection) -> Transform {
+            Transform {
+                surface_color: 0xff,
+                color_ratio: 0.2_f32,
+                inter
+            }
+        }
+    }
+
+    trait Transformer {
+        fn apply_transform(&self, input: Transform, shape: &dyn Shape, renderer: &Renderer) -> Transform;
+    }
+
+    struct ColorTransformer {
+        pub color: u32
+    }
+
+    impl Transformer for ColorTransformer {
+        fn apply_transform(&self, input: Transform, _shape: &dyn Shape, _renderer: &Renderer) -> Transform {
+            Transform {
+                surface_color: self.color,
+                ..input
+            }
+        }
+    }
+
+    struct ColorRatioTransformer {
+        pub color_ratio: f32
+    }
+
+    //impl Transformer for ColorRatioTransformer {
+        //fn apply_transform(&self, input: Transform, _shape: &dyn Shape, _renderer: &Renderer) -> Transform {
+
+        //}
+    //}
 }
 
 pub mod math {

@@ -5,31 +5,31 @@ use raytracer::primitives::Point;
 use sfml::window::{ Event, Style };
 use sfml::graphics::{RenderWindow, RenderTarget, Image, Color, Sprite, Texture};
 
-const XSCREEN: u32 = 256;
-const YSCREEN: u32 = 256;
+const XSCREEN: u32 = 1000;
+const YSCREEN: u32 = 1000;
 
 use raytracer::shapes::Sphere;
 
 fn setup_renderer() -> Renderer {
     let mut renderer = raytracer::Renderer::new(XSCREEN, YSCREEN, None);
 
-    renderer.objects.push(Box::new(Sphere::new (
+    renderer.scene.objects.push(Box::new(Sphere::new (
         Point::new(0., 0., 400.),
         150.
     )));
 
-    renderer.objects.push(Box::new(Sphere::new (
+    renderer.scene.objects.push(Box::new(Sphere::new (
         Point::new(100., 200., 300.),
         20.
     )));
 
-    renderer.lights.push(Box::new(DotLight {
+    renderer.scene.lights.push(Box::new(DotLight {
         pos: Point::new(500., 500., 0.),
         color: 0x0000ff,
         ..Default::default()
     }));
 
-    renderer.lights.push(Box::new(DotLight {
+    renderer.scene.lights.push(Box::new(DotLight {
         pos: Point::new(200., 0., 0.),
         color: 0xffff00,
         ..Default::default()
