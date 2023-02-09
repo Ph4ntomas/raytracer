@@ -2,16 +2,18 @@ use crate::{
     math::Polynomial2,
     primitives::{ Point, Ray },
     shapes::{ Intersection, Shape },
+    materials::Material
 };
 
 pub struct Sphere {
     pub position: Point,
     pub radius: f32,
+    pub material: Material,
 }
 
 impl Sphere {
     pub fn new(position: Point, radius: f32) -> Self {
-        Self { position, radius }
+        Self { position, radius, material: Default::default() }
     }
 }
 
@@ -48,5 +50,9 @@ impl Shape for Sphere {
                 position: ray.orig + ray.dir * dist,
                 normal: (ray.orig + ray.dir * dist) - self.position
             })
+    }
+
+    fn get_material(&self, inter: &Intersection) -> Material {
+        self.material
     }
 }

@@ -1,9 +1,8 @@
 use crate::{
     shapes::{Intersection, Shape},
     lights::{Light, LightRay},
-    transforms::Transform,
     Image,
-    Camera, primitives::Ray
+    Camera, primitives::{ Ray, Quaternion }
 };
 
 pub struct Scene {
@@ -13,7 +12,7 @@ pub struct Scene {
 }
 
 impl Scene {
-    fn find_closest_shape(&self, ray: Ray) -> Option<(&dyn Shape, Intersection)> {
+    fn find_closest_shape(&self, ray: &Ray) -> Option<(&dyn Shape, Intersection)> {
         self.objects.iter()
             .map(|s| (s, s.intersect(&ray)))
             .filter_map(|(s, inter)| Some(s.as_ref()).zip(inter))
@@ -32,13 +31,20 @@ impl Scene {
                 .collect()
     }
 
-    fn trace_ray(&self, ray: Ray, _max_recursion: u32) -> u32 {
-        if let Some((shape, inter)) = self.find_closest_shape(ray) {
-            let transform = Transform::init(inter);
-            let rays = self.find_light_rays(&transform.inter);
+    fn trace_ray(&self, ray: Ray, max_recursion: u32) -> u32 {
+        if let Some((shape, inter)) = self.find_closest_shape(&ray) {
+            let rays = self.find_light_rays(&inter);
+            let mat = shape.get_material(&inter);
+
+            if max_recursion > 0 {
+                let refl_color = if mat.reflection_amount > 0. && mat.refraction_amount < 1. {
+                    Some(self.trace_ray(reflect_ray(&ray, &inter), max_recursion - 1))
+                } else { None };
+
+            }
 
             if !rays.is_empty() {
-                apply_light(rays.as_slice(), shape, transform)
+                apply_light(rays.as_slice(), shape, 0xffffff)
             } else {
                 self.background_color
             }
@@ -46,6 +52,14 @@ impl Scene {
             self.background_color
         }
     }
+}
+
+fn reflect_ray(ray: &Ray, inter: &Intersection) -> Ray {
+    Ray {
+        orig: inter.position,
+        dir: Quaternion::new_rotation(90_f32.to_radians(), ray.dir.cross(&inter.normal)).rotate_vector(ray.dir)
+    }
+    //l ray.dir.cross(&inter.normal);
 }
 
 impl Default for Scene {
@@ -91,16 +105,12 @@ impl Renderer {
     }
 }
 
-fn apply_light(rays: &[(LightRay, f32)], shape: &dyn Shape, transform: Transform) -> u32 {
+fn apply_light(rays: &[(LightRay, f32)], shape: &dyn Shape, color: u32) -> u32 {
     let intensity = light_intensity(rays);
-    let light_color = light_color(shape, rays);
-    let col = transform.surface_color.to_be_bytes()
+    let col = color.to_be_bytes()
         .into_iter()
-        .map(|c| (c as f32) * transform.color_ratio.clamp(0., 1.))
-        .zip(light_color)
-        .map(|(c, lc)| c + lc * (1. - transform.color_ratio.clamp(0., 1.)))
         .zip(intensity)
-        .map(|(b, l)| ((b * l) as u8).clamp(0, 255))
+        .map(|(b, l)| ((b as f32 * l) as u8).clamp(0, 255))
         .collect::<Vec<u8>>();
 
     u32::from_be_bytes([col[0], col[1], col[2], col[3]])
