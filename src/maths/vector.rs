@@ -30,7 +30,7 @@
 //! scalar.
 //!
 
-use std::ops::{Add, Sub, Mul, Div, SubAssign, Neg, AddAssign, MulAssign, DivAssign};
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 ///
 /// Euclidean 3D Vector.
@@ -41,7 +41,7 @@ use std::ops::{Add, Sub, Mul, Div, SubAssign, Neg, AddAssign, MulAssign, DivAssi
 pub struct Vector {
     pub x: f32,
     pub y: f32,
-    pub z: f32
+    pub z: f32,
 }
 
 impl Vector {
@@ -49,7 +49,7 @@ impl Vector {
     /// Create a new Vector.
     ///
     pub fn new(x: f32, y: f32, z: f32) -> Self {
-        Self {x, y, z}
+        Self { x, y, z }
     }
 
     ///
@@ -67,7 +67,7 @@ impl Vector {
     /// Create a unit vector, parallel to the x axis.
     ///
     pub fn unit_x() -> Self {
-        Self::new( 1., 0., 0.)
+        Self::new(1., 0., 0.)
     }
 
     ///
@@ -313,7 +313,7 @@ mod tests {
     fn normalize_test() {
         let v = Vector::new(2., 3., 4.);
         let magn = v.magn();
-        let res = Vector::new(2./magn, 3./magn, 4./magn);
+        let res = Vector::new(2. / magn, 3. / magn, 4. / magn);
 
         assert_eq!(v.normalize(), res);
     }
@@ -420,10 +420,9 @@ mod tests {
     fn dot_test() {
         let x = Vector::new(2., 3., 4.);
         let y = Vector::new(3., 4., 5.);
-        let dot = 2. * 3. +  3. * 4. + 4. * 5.;
+        let dot = 2. * 3. + 3. * 4. + 4. * 5.;
 
         assert_eq!(x.dot(y), dot);
         assert_eq!(y.dot(x), dot);
-
     }
 }

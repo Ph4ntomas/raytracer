@@ -34,5 +34,5 @@ pub struct Quaternion {
     /// Second order imaginary
     pub j: f32,
     /// Third order imaginary
-    pub k: f32
+    pub k: f32,
 }

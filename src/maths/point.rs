@@ -18,7 +18,7 @@
 //! ```
 //!
 
-use std::ops::{Sub, Add};
+use std::ops::{Add, Sub};
 
 use super::vector::Vector;
 
@@ -31,7 +31,7 @@ use super::vector::Vector;
 pub struct Point {
     pub x: f32,
     pub y: f32,
-    pub z: f32
+    pub z: f32,
 }
 
 impl Point {

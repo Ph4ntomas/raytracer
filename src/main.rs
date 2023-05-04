@@ -12,8 +12,5 @@ fn model(_: &App) -> Model {
 fn view(_: &App, _model: &Model, _frame: Frame) {}
 
 fn main() {
-    nannou::app(model)
-        .update(update)
-        .simple_window(view)
-        .run();
+    nannou::app(model).update(update).simple_window(view).run();
 }
