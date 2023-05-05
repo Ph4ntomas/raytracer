@@ -18,7 +18,7 @@
 //! ```
 //!
 
-use std::ops::{Add, Sub};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 use super::vector::Vector;
 
@@ -72,6 +72,17 @@ impl Add<Vector> for Point {
     }
 }
 
+impl AddAssign<Vector> for Point {
+    ///
+    /// Apply the vector, in place.
+    ///
+    fn add_assign(&mut self, rhs: Vector) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
+    }
+}
+
 impl Sub<Vector> for Point {
     type Output = Point;
 
@@ -80,6 +91,17 @@ impl Sub<Vector> for Point {
     ///
     fn sub(self, rhs: Vector) -> Self::Output {
         Self::Output::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl SubAssign<Vector> for Point {
+    ///
+    /// Apply the inverse vector, in place.
+    ///
+    fn sub_assign(&mut self, rhs: Vector) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+        self.z -= rhs.z;
     }
 }
 
@@ -113,6 +135,18 @@ mod tests {
     }
 
     #[test]
+    fn add_assign_vector_to_point_test() {
+        let p = Point::new(1., 2., 3.);
+        let mut p2 = p;
+        let v = Vector::new(1., 2., 3.);
+
+        let res = Point::new(2., 4., 6.);
+
+        p2 += v;
+        assert_eq!(p2, res);
+    }
+
+    #[test]
     fn sub_vector_to_point_test() {
         let p = Point::new(2., 4., 6.);
         let v = Vector::new(1., 2., 3.);
@@ -120,5 +154,17 @@ mod tests {
         let res = Point::new(1., 2., 3.);
 
         assert_eq!(p - v, res);
+    }
+
+    #[test]
+    fn sub_assign_vector_to_point_test() {
+        let p = Point::new(2., 4., 6.);
+        let mut p2 = p;
+        let v = Vector::new(1., 2., 3.);
+
+        let res = Point::new(1., 2., 3.);
+
+        p2 -= v;
+        assert_eq!(p2, res);
     }
 }
