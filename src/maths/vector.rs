@@ -32,6 +32,8 @@
 
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
+use super::Quaternion;
+
 ///
 /// Euclidean 3D Vector.
 ///
@@ -48,7 +50,7 @@ impl Vector {
     ///
     /// Create a new Vector.
     ///
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    pub const fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
 
@@ -59,30 +61,22 @@ impl Vector {
     /// `a + zero = a`
     /// `b + zero = b`
     ///
-    pub fn zero() -> Self {
-        Self::new(0., 0., 0.)
-    }
+    pub const ZERO: Self = Self::new(0., 0., 0.);
 
     ///
-    /// Create a unit vector, parallel to the x axis.
+    /// Unit vector, parallel to the x axis.
     ///
-    pub fn unit_x() -> Self {
-        Self::new(1., 0., 0.)
-    }
+    pub const X: Self = Self::new(1., 0., 0.);
 
     ///
-    /// Create a unit vector, parallel to the y axis.
+    /// Unit vector, parallel to the y axis.
     ///
-    pub fn unit_y() -> Self {
-        Self::new(0., 1., 0.)
-    }
+    pub const Y: Self = Self::new(0., 1., 0.);
 
     ///
-    /// Create a unit vector, parallel to the z axis.
+    /// Unit vector, parallel to the z axis.
     ///
-    pub fn unit_z() -> Self {
-        Self::new(0., 0., 1.)
-    }
+    pub const Z: Self = Self::new(0., 0., 1.);
 
     ///
     /// Compute the dot (or scalar) product of two vectors.
@@ -136,6 +130,15 @@ impl Vector {
     ///
     pub fn normalize(self) -> Vector {
         self / self.magn()
+    }
+}
+
+impl From<Quaternion> for Vector {
+    ///
+    /// Convert a Vector Quaternion to a vector.
+    ///
+    fn from(value: Quaternion) -> Self {
+        Self::new(value.i, value.j, value.k)
     }
 }
 
@@ -265,7 +268,7 @@ impl Default for Vector {
     /// Return the Zero vector.
     ///
     fn default() -> Self {
-        Self::zero()
+        Self::ZERO
     }
 }
 
@@ -292,7 +295,7 @@ mod tests {
     #[test]
     fn zero_is_id_test() {
         let v = Vector::new(2., 3., 4.);
-        let z = Vector::zero();
+        let z = Vector::ZERO;
 
         assert_eq!(v + z, v);
         assert_eq!(v - z, v);
@@ -300,13 +303,13 @@ mod tests {
 
     #[test]
     fn normalize_leave_unit_untouched_test() {
-        let x = Vector::unit_x();
-        let y = Vector::unit_y();
-        let z = Vector::unit_z();
+        let x = Vector::X;
+        let y = Vector::Y;
+        let z = Vector::Z;
 
-        assert_eq!(x.normalize(), Vector::unit_x());
-        assert_eq!(y.normalize(), Vector::unit_y());
-        assert_eq!(z.normalize(), Vector::unit_z());
+        assert_eq!(x.normalize(), Vector::X);
+        assert_eq!(y.normalize(), Vector::Y);
+        assert_eq!(z.normalize(), Vector::Z);
     }
 
     #[test]
@@ -320,9 +323,9 @@ mod tests {
 
     #[test]
     fn cross_test() {
-        let x = Vector::unit_x();
-        let y = Vector::unit_y();
-        let z = Vector::unit_z();
+        let x = Vector::X;
+        let y = Vector::Y;
+        let z = Vector::Z;
 
         assert_eq!(x.cross(y), z);
         assert_eq!(y.cross(x), -z);
