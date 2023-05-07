@@ -18,7 +18,10 @@
 //! ```
 //!
 
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::{
+    fmt::Display,
+    ops::{Add, AddAssign, Sub, SubAssign},
+};
 
 use super::vector::Vector;
 
@@ -106,6 +109,12 @@ impl SubAssign<Vector> for Point {
 impl Default for Point {
     fn default() -> Self {
         Self::new(0., 0., 0.)
+    }
+}
+
+impl Display for Point {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("({}, {}, {})", self.x, self.y, self.z))
     }
 }
 
