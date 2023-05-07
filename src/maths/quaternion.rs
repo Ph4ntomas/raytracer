@@ -30,7 +30,7 @@ use super::Vector;
 ///
 /// See [module documentation](self) for more informations.
 ///
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Quaternion {
     /// Real part
     pub r: f32,
@@ -81,8 +81,7 @@ impl Quaternion {
     ///
     pub fn from_rotation(angle: f32, axis: Vector) -> Self {
         let angle = angle / 2.;
-        let cos = angle.cos();
-        let sin = angle.sin();
+        let (sin, cos) = angle.sin_cos();
 
         Self {
             r: cos,
@@ -91,16 +90,64 @@ impl Quaternion {
         .normalize()
     }
 
+    ///
+    /// Create a quaternion for a rotation around the x-axis.
+    ///
     pub fn from_x_rot(angle: f32) -> Self {
         Self::from_rotation(angle, Vector::X)
     }
 
+    ///
+    /// Create a quaternion for a rotation around the y-axis.
+    ///
     pub fn from_y_rot(angle: f32) -> Self {
         Self::from_rotation(angle, Vector::Y)
     }
 
+    ///
+    /// Create a quaternion for a rotation around the z-axis.
+    ///
     pub fn from_z_rot(angle: f32) -> Self {
         Self::from_rotation(angle, Vector::Z)
+    }
+
+    ///
+    /// Create a quaternion for transforming `from` to `to`.
+    ///
+    /// The inputs vector must be normalized.
+    ///
+    /// The way this function works is by first computing the dot and cross product of the inputs
+    /// vector, and building a quaternion from them.
+    ///
+    /// This gives us with a quaternion that would rotate a vector by twice the angle. Once we have
+    /// this quaternion, we can then compute the "halfway" quaternion by adding the identity quaternion
+    /// to it and normalizing the result.
+    ///
+    /// # Panics
+    /// Panics in debug if either `from` or `to` are not normalized.
+    ///
+    pub fn from_arc(from: Vector, to: Vector) -> Self {
+        debug_assert!(
+            from.is_normalized(),
+            "Quaternion::from_arc: from is not a unit vector."
+        );
+        debug_assert!(
+            from.is_normalized(),
+            "Quaternion::from_arc: to is not a unit vector."
+        );
+
+        const DOT_EPSILON: f32 = 1.0 - 2.0 * f32::EPSILON;
+
+        let dot = from.dot(to);
+
+        if dot > DOT_EPSILON {
+            Self::IDENTITY
+        } else if dot < -DOT_EPSILON {
+            Self::from_rotation(std::f32::consts::PI, from.any_orthonormal())
+        } else {
+            let cross = from.cross(to);
+            Self::new(1. + dot, cross.x, cross.y, cross.z).normalize()
+        }
     }
 
     ///
@@ -326,6 +373,47 @@ mod tests {
         assert_eq!(v.i, 0.);
         assert_eq!(v.j, 0.);
         assert_eq!(v.k, 0.);
+    }
+
+    #[test]
+    fn from_arc_no_rotation() {
+        let q = Quaternion::from_arc(Vector::X, Vector::X);
+
+        assert_eq!(q, Quaternion::IDENTITY);
+        assert_eq!(q * Vector::X, Vector::X);
+    }
+
+    #[test]
+    fn from_arc_half_rotation() {
+        let expected = -Vector::X;
+        let q = Quaternion::from_arc(Vector::X, expected);
+
+        let res = q * Vector::X;
+
+        let threshold = 1e-7;
+        let adj_x = f32::abs(expected.x - res.x);
+        let adj_y = f32::abs(expected.y - res.y);
+        let adj_z = f32::abs(expected.z - res.z);
+
+        assert!(adj_x <= threshold);
+        assert!(adj_y <= threshold);
+        assert!(adj_z <= threshold);
+    }
+
+    #[test]
+    fn from_arc_arbitrary_rotation() {
+        let expected = Vector::new(0., 1., 2.).normalize();
+        let q = Quaternion::from_arc(Vector::X, expected);
+        let res = q * Vector::X;
+
+        let threshold = 1e-7;
+        let adj_x = f32::abs(expected.x - res.x);
+        let adj_y = f32::abs(expected.y - res.y);
+        let adj_z = f32::abs(expected.z - res.z);
+
+        assert!(adj_x <= threshold);
+        assert!(adj_y <= threshold);
+        assert!(adj_z <= threshold);
     }
 
     #[test]
