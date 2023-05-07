@@ -30,7 +30,10 @@
 //! scalar.
 //!
 
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
+use std::{
+    fmt::Display,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+};
 
 use super::Quaternion;
 
@@ -313,6 +316,12 @@ impl Default for Vector {
     ///
     fn default() -> Self {
         Self::ZERO
+    }
+}
+
+impl Display for Vector {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("({}, {}, {})", self.x, self.y, self.z))
     }
 }
 
