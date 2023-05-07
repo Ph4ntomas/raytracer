@@ -79,6 +79,43 @@ impl Vector {
     pub const Z: Self = Self::new(0., 0., 1.);
 
     ///
+    /// Return a new unit vector, orthogonal to `self`
+    ///
+    /// See [pixar's paper](https://graphics.pixar.com/library/OrthonormalB/paper.pdf)
+    ///
+    /// # Panics
+    /// Panic in debug if `self` is not a unit vector
+    ///
+    pub fn any_orthonormal(self) -> Vector {
+        let (ret, _) = self.any_orthonormal_pair();
+        ret
+    }
+
+    ///
+    /// Return a new unit vector pair, both orthogonal to `self` and normalized.
+    ///
+    /// See [pixar's paper](https://graphics.pixar.com/library/OrthonormalB/paper.pdf)
+    ///
+    /// # Panics
+    /// Panic in debug if `self` is not a unit vector
+    ///
+    pub fn any_orthonormal_pair(self) -> (Vector, Vector) {
+        debug_assert!(
+            self.is_normalized(),
+            "Vector::any_orthonormal: `self` is not a unit vector."
+        );
+
+        let sign = f32::copysign(1.0, self.z);
+        let a = -1.0 / (sign + self.z);
+        let b = self.x * self.y * a;
+
+        (
+            Self::new(b, sign + self.y.powi(2) * a, -self.y),
+            Self::new(1.0 + sign * self.x.powi(2) * a, sign * b, -sign * self.x),
+        )
+    }
+
+    ///
     /// Compute the dot (or scalar) product of two vectors.
     ///
     /// The dot product can be computed as `a · b = ||a|| * ||b|| * cos(θ)`, with `θ` denoting the
@@ -128,8 +165,15 @@ impl Vector {
     ///
     /// A unit vector is defined as any vector with a magnitude of 1
     ///
-    pub fn normalize(self) -> Vector {
+    pub fn normalize(self) -> Self {
         self / self.magn()
+    }
+
+    ///
+    /// Check if the vector is normalized.
+    ///
+    pub fn is_normalized(self) -> bool {
+        f32::abs(self.magn() - 1.0) <= 1e-6
     }
 }
 
@@ -427,5 +471,61 @@ mod tests {
 
         assert_eq!(x.dot(y), dot);
         assert_eq!(y.dot(x), dot);
+    }
+
+    #[test]
+    fn any_orthonormal_pair_test() {
+        let v = Vector::new(1., 2., 3.).normalize();
+        let (v2, v3) = v.any_orthonormal_pair();
+
+        let threshold = 1e-6;
+
+        let angle_v_v2 = v.dot(v2).acos();
+        let angle_v_v3 = v.dot(v3).acos();
+        let angle_v2_v3 = v2.dot(v3).acos();
+
+        let deviation_v_v2 = f32::abs(angle_v_v2 - f32::to_radians(90.));
+        let deviation_v_v3 = f32::abs(angle_v_v3 - f32::to_radians(90.));
+        let deviation_v2_v3 = f32::abs(angle_v2_v3 - f32::to_radians(90.));
+
+        assert!(
+            deviation_v_v2 <= threshold,
+            "angle v - v2: Expected {}, got {}",
+            f32::to_radians(90.),
+            angle_v_v2
+        );
+        assert!(
+            deviation_v_v3 <= threshold,
+            "angle v - v3: Expected {}, got {}",
+            f32::to_radians(90.),
+            angle_v_v3
+        );
+        assert!(
+            deviation_v2_v3 <= threshold,
+            "angle v2 - v3: Expected {}, got {}",
+            f32::to_radians(90.),
+            angle_v2_v3
+        );
+
+        assert!(v2.is_normalized(), "v2 is not a unit vector");
+        assert!(v3.is_normalized(), "v3 is not a unit vector");
+    }
+
+    #[test]
+    fn any_orthonormal_test() {
+        let v = Vector::new(1., 2., 3.).normalize();
+        let v2 = v.any_orthonormal();
+
+        let angle = v.dot(v2).acos();
+        let threshold = 1e-6;
+        let deviation = f32::abs(angle - f32::to_radians(90.));
+
+        assert!(
+            deviation <= threshold,
+            "Expected {}, got {}",
+            f32::to_radians(90.),
+            angle
+        );
+        assert!(v2.is_normalized(), "v2 is not a unit vector");
     }
 }
