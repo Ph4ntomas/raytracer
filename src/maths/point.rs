@@ -38,16 +38,14 @@ impl Point {
     ///
     /// Create a new point.
     ///
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    pub const fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
 
     ///
     /// Space origin.
     ///
-    pub fn orig() -> Self {
-        Self::new(0., 0., 0.)
-    }
+    pub const ORIGIN: Point = Point::new(0., 0., 0.);
 }
 
 impl Sub for Point {
