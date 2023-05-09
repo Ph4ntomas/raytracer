@@ -43,11 +43,7 @@ impl Cylinder {
             let point = ray.orig + ray.dir * dist;
             let projection = self.pos + self.dir * (point - self.pos).dot(self.dir);
 
-            Some(Intersection::new(
-                dist,
-                point,
-                (point - projection).normalize(),
-            ))
+            Some(Intersection::new(dist, point, point - projection))
         } else {
             None
         }

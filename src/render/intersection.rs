@@ -16,6 +16,10 @@ pub struct Intersection {
 
 impl Intersection {
     pub fn new(dist: f32, pos: Point, normal: Vector) -> Self {
-        Self { dist, pos, normal }
+        Self {
+            dist,
+            pos,
+            normal: normal.normalize(),
+        }
     }
 }

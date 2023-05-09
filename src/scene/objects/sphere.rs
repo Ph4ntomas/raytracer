@@ -73,7 +73,7 @@ impl Sphere {
             .and_then(|x| x.into_iter().find(|r| r.is_sign_positive()))
             .map(|d| {
                 let pos = ray.orig + ray.dir * d;
-                let normal = (pos - self.pos).normalize();
+                let normal = pos - self.pos;
 
                 Intersection::new(d, pos, normal)
             })
