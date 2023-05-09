@@ -48,7 +48,7 @@ impl Renderer {
             .iter()
             .filter_map(|o| o.intersect(ray).zip(Some(o)));
 
-        let closest = inters.min_by(|(i, _), (i2, _)| i.dist.total_cmp(&i2.dist));
+        let closest = inters.min_by(|(i, _), (i2, _)| i.dist.partial_cmp(&i2.dist).unwrap());
 
         closest
             .map(|(inter, obj)| {
