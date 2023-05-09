@@ -6,7 +6,9 @@
 
 use crate::render::{Intersection, Ray};
 
+pub mod plan;
 pub mod sphere;
+pub use plan::Plan;
 pub use sphere::Sphere;
 
 ///
