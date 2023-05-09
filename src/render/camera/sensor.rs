@@ -20,8 +20,8 @@ use crate::render::camera::Fov;
 ///
 #[derive(Clone, Copy, Debug)]
 pub struct Sensor {
-    width: i32,
-    height: i32,
+    width: u32,
+    height: u32,
 }
 
 impl Sensor {
@@ -31,7 +31,7 @@ impl Sensor {
     /// # Panics:
     /// Panics if `width` or `Height` are not strictly positives integers.
     ///
-    pub fn new(width: i32, height: i32) -> Self {
+    pub fn new(width: u32, height: u32) -> Self {
         assert!(width > 0, "Sensor::new: width must be a positive integer.");
         assert!(
             height > 0,
@@ -54,8 +54,8 @@ impl Sensor {
     ///
     /// Check whether the pixel `(x, y)` is in bounds.
     ///
-    pub fn has_pixel(&self, x: i32, y: i32) -> bool {
-        0 <= x && x < self.width && 0 <= y && y < self.height
+    pub fn has_pixel(&self, x: u32, y: u32) -> bool {
+        x < self.width && y < self.height
     }
 
     ///
@@ -64,12 +64,16 @@ impl Sensor {
     /// This function remove half the screen width from the `x` and `y` coordinates, then flip the
     /// `y` coordinate, because this library use NDC space.
     ///
-    pub fn pixel_pos_to_render_pos(&self, x: i32, y: i32) -> Option<(f32, f32)> {
+    pub fn pixel_pos_to_render_pos(&self, x: u32, y: u32) -> Option<(f32, f32)> {
         if !self.has_pixel(x, y) {
             None
         } else {
-            let x = (x - self.width / 2) as f32;
-            let y = (-(y - self.height / 2)) as f32;
+            let half_w = (self.width / 2) as i32;
+            let half_h = (self.height / 2) as i32;
+
+            let x = ((x as i32) - half_w) as f32;
+            let y = (-((y as i32) - half_h)) as f32;
+
             Some((x, y))
         }
     }

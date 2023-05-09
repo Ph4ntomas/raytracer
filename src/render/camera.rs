@@ -77,7 +77,7 @@ impl Camera {
     /// Returns the [Ray](crate::render::rays::Ray) that would hit a given pixel of the `Camera`'s
     /// `Sensor`.
     ///
-    pub fn get_ray(&self, x: i32, y: i32) -> Option<Ray> {
+    pub fn get_ray(&self, x: u32, y: u32) -> Option<Ray> {
         self.sensor.pixel_pos_to_render_pos(x, y).map(|(x, y)| {
             let dir = Vector::new(x, y, 0.) + self.dist * Vector::Z;
             Ray::new(self.pos, (self.base_rot * dir).normalize())
