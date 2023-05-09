@@ -16,6 +16,7 @@ use crate::maths::{Point, Vector};
 ///
 /// See [module documentation](self) for more informations.
 ///
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub orig: Point,
     pub dir: Vector,
