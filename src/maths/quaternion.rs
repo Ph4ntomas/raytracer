@@ -240,14 +240,6 @@ impl Mul for Quaternion {
     /// Will panic if `self` or `rhs` are not unit quaternions
     ///
     fn mul(self, rhs: Self) -> Self::Output {
-        debug_assert!(
-            self.is_normalized(),
-            "Quaternion::mul: self is not normalized"
-        );
-        debug_assert!(
-            rhs.is_normalized(),
-            "Quaternion::mul: rhs is not normalized"
-        );
         let r = self.r * rhs.r - self.i * rhs.i - self.j * rhs.j - self.k * rhs.k;
         let i = self.r * rhs.i + self.i * rhs.r + self.j * rhs.k - self.k * rhs.j;
         let j = self.r * rhs.j - self.i * rhs.k + self.j * rhs.r + self.k * rhs.i;
