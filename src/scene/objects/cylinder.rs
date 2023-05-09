@@ -37,6 +37,7 @@ impl Cylinder {
 
         let inter = Polynom2::new(a, b, c)
             .roots()
+            .filter(|[_, r2]| !r2.is_nan())
             .and_then(|x| x.into_iter().find(|r| r.is_sign_positive()));
 
         if let Some(dist) = inter {

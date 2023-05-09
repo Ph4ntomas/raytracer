@@ -39,7 +39,7 @@ impl Polynom2<f32> {
         } else if delta <= 1e-7 {
             // This should be changed to f32::next_up(0.) once stabilized.
             let r = -self.b / 2. * self.a;
-            Some([r, r])
+            Some([r, f32::NAN])
         } else {
             let sqr = delta.sqrt();
 
