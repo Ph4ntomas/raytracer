@@ -1,10 +1,13 @@
 //! Maths primitives and utilities
 
+pub mod point;
+pub mod quaternion;
 pub mod vector;
+
+pub mod polynom2;
+
+pub use point::Point;
+pub use quaternion::Quaternion;
 pub use vector::Vector;
 
-pub mod point;
-pub use point::Point;
-
-pub mod quaternion;
-pub use quaternion::Quaternion;
+pub use polynom2::Polynom2;
