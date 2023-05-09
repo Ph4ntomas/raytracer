@@ -6,10 +6,12 @@
 
 use crate::render::{Intersection, Ray};
 
+pub mod cone;
 pub mod cylinder;
 pub mod plan;
 pub mod sphere;
 
+pub use cone::Cone;
 pub use cylinder::Cylinder;
 pub use plan::Plan;
 pub use sphere::Sphere;
