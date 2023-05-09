@@ -31,11 +31,11 @@ impl Cone {
     pub fn intersect(&self, ray: Ray) -> Option<Intersection> {
         let adj = ray.orig - self.pos;
 
-        let tan2 = self.angle.tan().powi(2);
+        let sin2 = (self.angle / 2.).sin().powi(2);
 
-        let a = 1.0 - tan2 - ray.dir.dot(self.dir).powi(2);
-        let b = 2.0 * (adj.dot(ray.dir) * (1.0 - tan2) - self.dir.dot(ray.dir) * self.dir.dot(adj));
-        let c = adj.magn2() * (1. - tan2) - self.dir.dot(adj).powi(2);
+        let a = 1. - sin2 - ray.dir.dot(self.dir).powi(2);
+        let b = 2. * (adj.dot(ray.dir) * (1. - sin2) - self.dir.dot(ray.dir) * self.dir.dot(adj));
+        let c = adj.magn2() * (1. - sin2) - self.dir.dot(adj).powi(2);
 
         let inter = Polynom2::new(a, b, c)
             .roots()
