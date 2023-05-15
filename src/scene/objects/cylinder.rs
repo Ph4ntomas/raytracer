@@ -31,8 +31,8 @@ impl Cylinder {
     pub fn intersect(&self, ray: Ray) -> Option<Intersection> {
         let adj = ray.orig - self.pos;
 
-        let a = 1.0 - self.dir.dot(ray.dir).powi(2);
-        let b = 2.0 * adj.dot(ray.dir) - ray.dir.dot(self.dir) * adj.dot(self.dir);
+        let a = 1. - self.dir.dot(ray.dir).powi(2);
+        let b = 2. * (adj.dot(ray.dir) - ray.dir.dot(self.dir) * adj.dot(self.dir));
         let c = adj.magn2() - adj.dot(self.dir).powi(2) - self.radius.powi(2);
 
         let inter = Polynom2::new(a, b, c)
